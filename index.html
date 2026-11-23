@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bobby Money">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Bobby Money Tracker</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#131e30;--panel2:#1b2940;--line:#293850;--text:#eef4ff;--muted:#9aabc2;--green:#54d6a0;--red:#ff7e86;--blue:#79b7ff}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#101d31,#090f1b 60%);color:var(--text);font:15px system-ui,-apple-system,sans-serif;padding:env(safe-area-inset-top) 14px calc(24px + env(safe-area-inset-bottom));max-width:760px;margin:auto}
+header{padding:22px 4px 16px}h1{font-size:25px;margin:0 0 5px;letter-spacing:.2px}.sub{color:var(--muted);font-size:13px}
+.monthbar{display:flex;gap:8px;align-items:center;margin:10px 0 14px}.monthbar input{flex:1}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card,.panel{background:rgba(19,30,48,.96);border:1px solid var(--line);border-radius:17px;padding:15px;box-shadow:0 8px 24px #0002}
+.card small,.muted{color:var(--muted)}.amount{font-size:23px;font-weight:750;margin-top:5px;letter-spacing:-.5px}.green{color:var(--green)}.red{color:var(--red)}
+.progress{height:8px;background:#26354b;border-radius:20px;overflow:hidden;margin-top:10px}.progress span{display:block;height:100%;background:var(--green);border-radius:20px}
+.panel{margin-top:12px}.panel h2{font-size:17px;margin:0 0 13px}
+form{display:grid;grid-template-columns:1fr 1fr;gap:10px}label{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}input,select,button{font:inherit;border-radius:11px;border:1px solid var(--line);background:#0e1929;color:var(--text);padding:12px;width:100%;min-width:0}input:focus,select:focus{outline:2px solid #548fc9}
+.wide{grid-column:1/-1}button{background:#275d50;border:0;font-weight:700;cursor:pointer}button.secondary{background:var(--panel2);border:1px solid var(--line)}button.danger{background:#512b37}
+.actions{display:flex;gap:8px;margin-top:10px}.actions button{flex:1;font-size:13px;padding:11px 7px}
+.list{display:flex;flex-direction:column;gap:8px}.tx{display:flex;align-items:center;gap:10px;padding:11px;border-radius:12px;background:#0e1929;border:1px solid #24334a}.emoji{width:38px;height:38px;border-radius:12px;background:#1b2b43;display:grid;place-items:center;font-size:19px;flex:none}.txmain{min-width:0;flex:1}.txmain b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.txmain small{color:var(--muted)}.txamt{font-weight:700;white-space:nowrap}.delete{width:auto;padding:7px 9px;background:#422632;color:#ffb1b6}
+.bars{display:flex;flex-direction:column;gap:10px}.barrow{display:grid;grid-template-columns:100px 1fr auto;gap:8px;align-items:center;font-size:13px}.barbg{height:9px;background:#26354b;border-radius:20px;overflow:hidden}.barbg span{display:block;height:100%;background:var(--blue)}
+.footer{color:var(--muted);font-size:11px;text-align:center;padding:18px 4px}.empty{color:var(--muted);text-align:center;padding:18px 4px;font-size:13px}
+@media(max-width:380px){.amount{font-size:20px}.barrow{grid-template-columns:84px 1fr auto}}
+</style>
+</head>
+<body>
+<header>
+  <h1>BOBBY MONEY TRACKER</h1>
+  <div class="sub">Quản lý tiền cá nhân · Dữ liệu lưu trên thiết bị này</div>
+</header>
+<div class="monthbar">
+  <label for="month" style="margin:0;white-space:nowrap">Tháng xem</label>
+  <input id="month" type="month">
+</div>
+<section class="cards">
+  <div class="card"><small>Thu nhập tháng</small><div class="amount" id="incomeVal">8.500.000đ</div></div>
+  <div class="card"><small>Đã chi tháng này</small><div class="amount red" id="expenseVal">0đ</div></div>
+  <div class="card"><small>Còn lại</small><div class="amount green" id="remainVal">8.500.000đ</div><div class="progress"><span id="progress" style="width:0%"></span></div></div>
+  <div class="card"><small>Đã tiết kiệm</small><div class="amount green" id="savingVal">0đ</div></div>
+</section>
+
+<section class="panel">
+  <h2>＋ Thêm giao dịch</h2>
+  <form id="txForm">
+    <div><label for="date">Ngày</label><input id="date" type="date" required></div>
+    <div><label for="type">Loại giao dịch</label><select id="type"><option value="expense">Chi tiêu</option><option value="income">Thu nhập</option><option value="saving">Tiết kiệm</option></select></div>
+    <div><label for="amount">Số tiền (đ)</label><input id="amount" type="number" min="1000" step="1000" placeholder="Ví dụ: 45000" required></div>
+    <div><label for="category">Danh mục</label><select id="category"></select></div>
+    <div class="wide"><label for="note">Nội dung / ghi chú</label><input id="note" maxlength="70" placeholder="Ví dụ: Cà phê với bạn"></div>
+    <button class="wide" type="submit">Lưu giao dịch</button>
+  </form>
+</section>
+
+<section class="panel">
+  <h2>Chi tiêu theo danh mục</h2>
+  <div class="bars" id="categoryBars"></div>
+</section>
+
+<section class="panel">
+  <h2>Lịch sử giao dịch</h2>
+  <div class="list" id="transactions"></div>
+</section>
+
+<section class="panel">
+  <h2>Sao lưu dữ liệu</h2>
+  <div class="sub" style="margin-bottom:10px">Dữ liệu nằm trong trình duyệt trên thiết bị này. Hãy xuất bản sao định kỳ để tránh mất dữ liệu khi đổi máy hoặc xóa dữ liệu Safari.</div>
+  <div class="actions">
+    <button class="secondary" id="exportBtn" type="button">Xuất sao lưu</button>
+    <button class="secondary" id="importBtn" type="button">Nhập sao lưu</button>
+  </div>
+  <input id="fileInput" type="file" accept="application/json,.json" hidden>
+  <div class="actions"><button class="danger" id="clearBtn" type="button">Xóa toàn bộ dữ liệu</button></div>
+</section>
+<div class="footer">Bobby Money Tracker · Bản cá nhân · Không gửi dữ liệu lên máy chủ</div>
+<script>
+const KEY='bobby-money-tracker-v1';
+const categories={
+ expense:[['food','🍜 Ăn uống'],['family','🏠 Gia đình'],['transport','🛵 Xăng xe'],['phone','📱 Điện thoại / Internet'],['personal','🧴 Cá nhân'],['fun','☕ Giải trí'],['love','💛 Người yêu / gặp gỡ'],['shopping','🛍️ Mua sắm / phát sinh'],['other','📦 Khác']],
+ income:[['salary','💼 Lương'],['extra','✨ Thu nhập phụ'],['gift','🎁 Thưởng / quà'],['other','📦 Khác']],
+ saving:[['saving','🏦 Tiết kiệm'],['emergency','🧰 Quỹ dự phòng']]
+};
+let data=JSON.parse(localStorage.getItem(KEY)||'{"income":8500000,"transactions":[]}');
+const $=id=>document.getElementById(id);
+const money=n=>Math.round(n||0).toLocaleString('vi-VN')+'đ';
+const today=new Date();
+$('month').value=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+$('date').value=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+function persist(){localStorage.setItem(KEY,JSON.stringify(data));render()}
+function updateCats(){const t=$('type').value;$('category').innerHTML=categories[t].map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}
+$('type').addEventListener('change',updateCats);updateCats();
+$('txForm').addEventListener('submit',e=>{
+ e.preventDefault();const amount=Number($('amount').value);if(!amount||amount<1000)return;
+ const type=$('type').value,cat=$('category').value;
+ data.transactions.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),date:$('date').value,type,category:cat,amount,note:$('note').value.trim()});
+ $('amount').value='';$('note').value='';persist();
+});
+$('month').addEventListener('change',render);
+function render(){
+ const month=$('month').value;const tx=data.transactions.filter(x=>x.date?.startsWith(month)).sort((a,b)=>b.date.localeCompare(a.date));
+ const expenses=tx.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amount,0);
+ const incomes=tx.filter(x=>x.type==='income').reduce((s,x)=>s+x.amount,0);
+ const savings=tx.filter(x=>x.type==='saving').reduce((s,x)=>s+x.amount,0);
+ const income=data.income+incomes,remain=income-expenses-savings;
+ $('incomeVal').textContent=money(income);$('expenseVal').textContent=money(expenses);$('remainVal').textContent=money(remain);$('savingVal').textContent=money(savings);
+ $('progress').style.width=Math.min(100,expenses/Math.max(income,1)*100)+'%';
+ const sums={};tx.filter(x=>x.type==='expense').forEach(x=>sums[x.category]=(sums[x.category]||0)+x.amount);
+ const labels=Object.fromEntries(categories.expense);
+ const entries=Object.entries(sums).sort((a,b)=>b[1]-a[1]);
+ $('categoryBars').innerHTML=entries.length?entries.map(([k,v])=>`<div class="barrow"><span>${labels[k]||k}</span><div class="barbg"><span style="width:${v/Math.max(...entries.map(x=>x[1]))*100}%"></span></div><b>${money(v)}</b></div>`).join(''):'<div class="empty">Chưa có khoản chi nào trong tháng này.</div>';
+ const allLabels={...Object.fromEntries(categories.expense),...Object.fromEntries(categories.income),...Object.fromEntries(categories.saving)};
+ $('transactions').innerHTML=tx.length?tx.map(x=>`<div class="tx"><div class="emoji">${(allLabels[x.category]||'📌').split(' ')[0]}</div><div class="txmain"><b>${escapeHtml(x.note||allLabels[x.category]||x.category)}</b><small>${x.date} · ${x.type==='expense'?'Chi tiêu':x.type==='income'?'Thu nhập':'Tiết kiệm'}</small></div><div class="txamt ${x.type==='income'||x.type==='saving'?'green':'red'}">${x.type==='expense'?'-': '+'}${money(x.amount)}</div><button class="delete" data-del="${x.id}" aria-label="Xóa">×</button></div>`).join(''):'<div class="empty">Chưa có giao dịch. Thêm khoản đầu tiên ở phía trên nha.</div>';
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('transactions').addEventListener('click',e=>{const id=e.target.dataset.del;if(!id)return;if(confirm('Xóa giao dịch này?')){data.transactions=data.transactions.filter(x=>x.id!==id);persist()}});
+$('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bobby-money-backup.json';a.click();URL.revokeObjectURL(a.href)};
+$('importBtn').onclick=()=>$('fileInput').click();
+$('fileInput').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!Array.isArray(d.transactions))throw Error();if(confirm('Nhập bản sao lưu và thay thế dữ liệu hiện tại?')){data={income:Number(d.income)||8500000,transactions:d.transactions};persist();alert('Đã nhập dữ liệu.')}}catch{alert('File sao lưu không hợp lệ.')}e.target.value=''};
+$('clearBtn').onclick=()=>{if(confirm('Xóa toàn bộ giao dịch? Hãy xuất sao lưu trước nếu cần.')){data={income:8500000,transactions:[]};persist()}};
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+render();
+</script>
+</body></html>
